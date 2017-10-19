@@ -2,15 +2,15 @@ class Cell {
     constructor(_id){
         this.id = _id;
         this.colors = [
-            'grey',
-            'yellow', 
-            'orange', 
-            'red', 
-            'olive', 
-            'green', 
-            'teal', 
-            'blue',
-            'violet', 
+            '#eeeeee',
+            '#7CB5E2', 
+            '#4495D4', 
+            '#2F6895', 
+            '#F5BD70', 
+            '#F2A032', 
+            '#CD8829', 
+            '#E37051',
+            '#DE5833', 
             'purple', 
             'pink', 
             'brown', 
@@ -19,8 +19,18 @@ class Cell {
         this.reset();
     }
 
-    upgrade = (cell) => {
-        (cell.isEmpty() || cell.points < 3) ? this.points = cell.points : this.points++;
+    moveTo = (cell) => {
+        if(cell.isEmpty()){
+            cell.points = this.points
+            this.reset();                               
+        } else if(this.points === cell.points) {
+            cell.points = this.points + this.points;
+            this.reset();
+        }
+    }
+
+    canMoveTo = (cell) => {
+        return cell && this.id !== cell.id && (cell.isEmpty() || this.same(cell))
     }
 
     isEmpty = () => {
@@ -28,11 +38,10 @@ class Cell {
     }
 
     start = () => {
-        this.points = this.random(1,2);
-    }
-
-    random = (min, max) => {
-        return  Math.floor(Math.random() * (max - min + 1)) + min;
+        if(Math.random() < 0.5)
+            this.points = 2;
+        else
+            this.points = 4;
     }
 
     same = (cell) => {
@@ -44,11 +53,11 @@ class Cell {
     }
 
     color = () => {
-        return this.colors[this.points];
+        return this.colors[ this.points / 4 ];
     }
 
     value = () => {
-        return this.points ?  ( this.points === 1 ? 2 : this.points * this.points ) : '';
+        return this.points ? this.points : ''; //return this.points ? Math.pow(2, this.points) : '';
     }
 }
 
