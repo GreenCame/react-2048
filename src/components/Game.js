@@ -1,21 +1,27 @@
 import React, { Component } from 'react';
-import { Grid } from 'semantic-ui-react';
+import { Grid, Dimmer, Segment, Icon, Header } from 'semantic-ui-react';
 import Cell from '../models/cell';
 import Cellule from './Cellule';
 
 class Game extends Component {
     constructor(props){
-        super(props)
+        super(props) 
 
-        let cells = this.props.cells;
+        this.useLocalStorage = false;
+        let cells = this.initCells();
+        let localstorageCells = JSON.parse(localStorage.getItem('cells'));
 
-        for(let i = 0; i < 16 ; i++)
-            cells[i] = new Cell(i);
-        
-        this.state = {
-            cells : cells
+        if(localstorageCells) {
+            this.useLocalStorage = true;
+            for(let i = 0; i < cells.length ; i++)
+                cells[i].points = localstorageCells[i].points;
         }
 
+        this.state = {
+            cells : cells,
+            gameover : false
+        }
+        
         this.key = {
             LEFT: 37,
             UP: 38,
@@ -24,16 +30,32 @@ class Game extends Component {
         }
     }
 
+    initCells = () => {
+        let cells = [];
+        
+        for(let i = 0; i < 16 ; i++)
+            cells[i] = new Cell(i);
+
+        return cells;
+    }
+
     componentWillMount() {
-        this.initEmptyCell()
+        if(this.useLocalStorage)
+            this.updateScore();
+        else
+            this.nextTurn();
+
         document.addEventListener("keyup", this._handlePlayKey, false); 
     }
 
-    componentDidMount() {
-        //
+    componentWillUnmount() {
+        document.removeEventListener("keyup", this._handlePlayKey, false); 
     }
 
     _handlePlayKey = (e) => {
+        if(this.state.gameover)
+            return
+
         if(e.keyCode === this.key.DOWN){
             console.log('look like your fired key DOWN');
 
@@ -142,34 +164,64 @@ class Game extends Component {
     }    
 
     nextTurn = () => {
-        this.initEmptyCell()        
-    }
-
-    initEmptyCell = () => {
         let emptyCells = this.state.cells.filter((c) => {
            return c.isEmpty()
         });
 
-        let cells = this.state.cells;
-        cells[ emptyCells[this.random(0, emptyCells.length - 1)].id ].start();
+        if(emptyCells.length === 0) //GAME OVER
+            this.setState({ gameover : true })
+        else {
+            let cells = this.state.cells;
+            cells[ emptyCells[this.random(0, emptyCells.length - 1)].id ].start();
 
-        this.setState( { cells : cells } );
+            this.setState( { cells : cells } );
+        }
+
+        //localstorage
+        localStorage.setItem('cells', JSON.stringify(this.state.cells));
+
+        this.updateScore();        
+    }
+
+    updateScore() {
+        //change score
+        this.props.changeScore(this.state.cells.reduce((prev, c) => prev + c.value(), 0));       
     }
 
     random = (min, max) => {
         return  Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    refresh = () => {
+        console.log('refresh')
+        this.setState({ cells : [] });
+
+        setTimeout(() => {
+            this.setState({ cells : this.initCells(), gameover : false })
+            
+            this.nextTurn();
+        }, 0)
+       
+    }
+
     render() {
         return (
             <div>
-                <Grid style={{maxWidth : 250}}>
-                    {
-                        this.state.cells.map((c) =>
-                            <Cellule key={ c.id } cell={ c }/>
-                        )
-                    }                   
-                </Grid>
+                <Dimmer.Dimmable as={Segment} dimmed={ this.state.gameover }>
+                    <Dimmer active={ this.state.gameover } onClickOutside={ this.refresh }>
+                        <Header as='h2' icon inverted>
+                            <Icon name='frown' />
+                            Game Over !
+                        </Header>
+                    </Dimmer>
+                    <Grid style={{maxWidth : 350}}>
+                        {
+                            this.state.cells.map((c) =>
+                                <Cellule key={ c.id } cell={ c }/>
+                            )
+                        }                   
+                    </Grid>
+                </Dimmer.Dimmable>
             </div>
         );
     }

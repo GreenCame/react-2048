@@ -12,7 +12,7 @@ class Cellule extends Component {
 
     render() {
         return (
-            <Grid.Column width={4} className="cell" style={{ backgroundColor : this.state.cell.color()}} stretched>
+            <Grid.Column width={4} className="cell" style={{ backgroundColor : this.state.cell.color(), color: 'white', 'fontSize': '23px', 'paddingTop': '24px'}} stretched>
                 { this.state.cell.value() }
             </Grid.Column>
         );

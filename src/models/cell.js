@@ -24,7 +24,7 @@ class Cell {
             cell.points = this.points
             this.reset();                               
         } else if(this.points === cell.points) {
-            cell.points = this.points + this.points;
+            cell.points = this.points + 1;
             this.reset();
         }
     }
@@ -38,10 +38,7 @@ class Cell {
     }
 
     start = () => {
-        if(Math.random() < 0.5)
-            this.points = 2;
-        else
-            this.points = 4;
+        this.points = (Math.random() < 0.5) ? 1 : 2;
     }
 
     same = (cell) => {
@@ -53,11 +50,11 @@ class Cell {
     }
 
     color = () => {
-        return this.colors[ this.points / 4 ];
+        return this.colors[ this.points ];
     }
 
     value = () => {
-        return this.points ? this.points : ''; //return this.points ? Math.pow(2, this.points) : '';
+        return this.points ? Math.pow(2, this.points) : null; //return this.points ? Math.pow(2, this.points) : '';
     }
 }
 

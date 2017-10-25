@@ -1,24 +1,35 @@
 import React, { Component } from 'react';
 import Game from './Game';
-import { Container, Button, Form, Grid, Header, Image, Message, Segment, Icon } from 'semantic-ui-react'
+import { Container, Button, Form, Grid, Header, Image, Message, Segment, Icon, Label } from 'semantic-ui-react'
 
 class App extends Component {
   constructor(){
     super();
     this.state = {
-      cells : []
+      score : 0,
+      bestScore : localStorage.getItem('bestScore') || 0,
     }
   }
 
   _handleClick = () => {
-    console.log("sdfdskfdj")
-    this.setState({ cells :[] })
+    this.refs.game.refresh();
+  }
+
+  changeScore = (score) => {
+    let bestScore = (score >= this.state.bestScore) ? score : this.state.bestScore;
+    this.setState({ score : score , bestScore : bestScore });
+    localStorage.setItem('bestScore', this.state.bestScore) 
   }
 
   render() {
     return ( 
     <div className='login-form'>
       <style>{`
+        html, body {
+          box-sizing: border-box;
+          font-family: 'Roboto';                    
+          height: 100%;
+        }    
         body > div,
         body > div > div,
         body > div > div > div.login-form {
@@ -26,33 +37,38 @@ class App extends Component {
         }
         .cell {
           border: 1px solid #fff;
-          min-height : 60px;
-          max-height : 60px;
-          min-width : 60px;
-          max-width : 60px;
+          font-family: 'Acme';          
+          min-height : 72px;
+          max-height : 72px;
+          min-width : 72px;
+          max-width : 72px;
         }
       `}</style>
       <Grid
         textAlign='center'
-        style={{ height: '100%' }}
+        style={{ height: '100%', margin : 0 }}
         verticalAlign='middle'
       >
-        <Grid.Column style={{ maxWidth: 450 }}>
+        <Grid.Column style={{ maxWidth: 349 }}>
           <Header as='h2' color='teal' textAlign='center'>
-            <Grid>
+            <Grid style={{alignItems: 'end'}}>
               <Grid.Column width={4}>
                 2048
               </Grid.Column>
-              <Grid.Column width={8}>
-                <Button circular color='teal' icon='refresh' onClick={ this._handleClick }/>
-                <Button circular color='teal' icon onClick={ this._handleClick }>
-                  <Icon name='refresh'/>
-                </Button> 
+              <Grid.Column as="div" width={8}>
+                <Label>
+                  <Icon name='trophy' />
+                  { this.state.bestScore }
+                </Label><br/> 
+                Score : { this.state.score }               
+              </Grid.Column>
+              <Grid.Column as="div" style={{paddingLeft: '30px'}} width={2}>
+                  <Icon name="refresh" onClick={ this._handleClick }/>
               </Grid.Column>
             </Grid>
           </Header>
           <Segment stacked>
-            <Game cells={ this.state.cells } />          
+            <Game ref="game" changeScore={ this.changeScore } />          
           </Segment>
           <Message>
             Created by <a href='julien.mustiere.info'>Julien Mustière</a>
