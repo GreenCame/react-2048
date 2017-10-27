@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Game from './Game';
-import { Container, Button, Form, Grid, Header, Image, Message, Segment, Icon, Label } from 'semantic-ui-react'
+import { Grid, Header, Message, Segment, Icon, Label } from 'semantic-ui-react'
 
 class App extends Component {
   constructor(){
