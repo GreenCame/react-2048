@@ -39,7 +39,7 @@ class Game extends Component {
         return cells;
     }
 
-    componentWillMount() {
+    componentDidMount() {
         if(this.useLocalStorage)
             this.updateScore();
         else
